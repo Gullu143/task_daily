@@ -1,12 +1,18 @@
 import React, {useState} from 'react'
 import { useMutation } from '@apollo/client';
 import { SUBMIT_REVIEW } from '../gqloperations/mutations';
+import { useNavigate } from "react-router-dom";
 
 export default function CreateReview() {
 
-  const [acomment, setComment] = useState("");
-  const [arating, setrating] = useState("");
-  const [alocation, setLocation] = useState("");
+  const navigate = useNavigate();
+
+
+  const [variables, setVariables] = useState( {
+      comment: '',
+      rating: '',
+      locationId: ''
+  });
 
 
 
@@ -15,22 +21,24 @@ export default function CreateReview() {
       'locations'
     ]
   })
-  
 
   if(loading) return <h1>Loading</h1>
  
+ const handleChange = (e)=> {
+  setVariables({...variables, [e.target.name]:  e.target.type==='number' ? +e.target.value : e.target.value})
+ }
 
+//  const StringToNumber = (e)=> {
+//   setVariables({...variables, rating:parseInt(e.target.value)})
+//  }
 
   const SubmitHandle = (e)=> {
     e.preventDefault();
     submitReview({
-      variables:{
-        comment: acomment,
-        rating: arating,
-        locationId: alocation
-      }
+        variables
     })
-  
+    navigate("/");
+    console.log(variables)
   }
 
 
@@ -41,21 +49,25 @@ export default function CreateReview() {
         error && 
         <h1>{error.message}</h1>
       }
+    
       
 
 
       <form onSubmit={(e)=>SubmitHandle(e)}>
         <input type= 'text'
           placeholder='Enter comment'
-          onChange={(e)=>setComment(e.target.value)}
+          name='comment'
+          onChange={handleChange}
         />
          <input type= 'number'
           placeholder='Enter rating'
-          onChange={(e)=>setrating(parseInt(e.target.value))}
+          name='rating'
+          onChange={handleChange} 
         />
          <input type= 'text'
           placeholder='Enter location ID'
-          onChange={(e)=>setLocation(e.target.value)}
+          name='locationId'
+          onChange={handleChange}
         />
         <input type= 'submit'/>
       </form>
